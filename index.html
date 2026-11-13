@@ -87,7 +87,32 @@
     .risk-caution { color: #fde68a; border-color: #b45309; background: rgba(120, 53, 15, .56); }
     .risk-none { color: #bfdbfe; border-color: #1d4ed8; background: rgba(30, 58, 138, .48); }
     .risk-unknown { color: #e5e7eb; border-color: #4b5563; background: rgba(31, 41, 55, .82); }
+
+    /* === V20.5: تخطيط الهواتف + معاينة الكاميرا (يتغلب على Tailwind بـ !important) === */
+    #main-screen { height: var(--app-h, 100dvh) !important; }
+    @media (max-height: 700px) {
+      #top-bar button { min-height: 40px !important; }
+      #mode-strip button { min-height: 38px !important; }
+      #control-dock { gap: 5px !important; padding-top: 6px !important; }
+      #control-dock button { min-height: 52px !important; font-size: 12px !important; padding: 4px 2px !important; }
+      #control-dock .control-icon { font-size: 1.1rem !important; }
+    }
+    @media (max-height: 600px) {
+      #top-bar button { min-height: 36px !important; font-size: 11.5px !important; }
+      #mode-strip button { min-height: 34px !important; }
+      #control-dock button { min-height: 44px !important; font-size: 11px !important; }
+    }
+    body #camera-preview { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover !important; opacity: 1 !important; border: 0 !important; border-radius: 0 !important; z-index: 0 !important; }
+    body #camera-preview.mirror { transform: scaleX(-1) !important; }
+    body:not(.preview-off) #capture-btn { background: linear-gradient(to bottom, transparent 30%, rgba(3,7,18,.82)) !important; justify-content: flex-end !important; padding: 0 0 12px !important; }
+    body:not(.preview-off) #capture-btn span { text-shadow: 0 1px 4px #000; }
+    body.preview-off #camera-preview { inset: auto !important; top: 8px !important; right: 8px !important; width: 56px !important; height: 56px !important; opacity: .6 !important; border: 1px solid #374151 !important; border-radius: 8px !important; z-index: 10 !important; }
   </style>
+<script>
+  (function () { function h() { var v = window.visualViewport; document.documentElement.style.setProperty('--app-h', Math.round(v ? v.height : window.innerHeight) + 'px'); }
+    h(); window.addEventListener('resize', h); window.addEventListener('orientationchange', function () { setTimeout(h, 250); });
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', h); })();
+</script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">
 
@@ -111,6 +136,8 @@
               style="min-height: 76px;">
         <span aria-hidden="true">▶ </span>ابدأ الآن (مجاني بالكامل)
       </button>
+
+      <label class="settings-step flex items-center gap-3 text-sm text-gray-100"><input id="preview-check" type="checkbox" checked><span>عرض معاينة الكاميرا كاملة على الشاشة (للمبصر المساعد وضعاف البصر)</span></label>
 
       <button id="setup-guide-button" type="button" onclick="speakSetupGuide()"
               class="settings-action bg-indigo-700 hover:bg-indigo-600 text-white text-base">
@@ -760,6 +787,7 @@ async function startCamera() {
     catch (e2) { updateStatus('امنح إذن الكاميرا من المتصفح.'); speak('تعذر الوصول إلى الكاميرا'); return; }
   }
   videoElement.srcObject = videoStream;
+  videoElement.classList.toggle('mirror', facingMode === 'user');
   try { await videoElement.play(); } catch (e) {}
   detectTorchSupport();
 }
@@ -2509,6 +2537,13 @@ window.addEventListener('load', () => {
   if (hasCloudVision()) { apiKeyInput.value = apiKey; proxyUrlInput.value = proxyUrl; startApp(false); }
   else setTimeout(() => { document.getElementById('settings-heading').focus(); }, 250);
 });
+</script>
+<script>
+  (function () { var k = 'sanad_preview', el = document.getElementById('preview-check'), on = true;
+    try { on = localStorage.getItem(k) !== '0'; } catch (e) {}
+    function ap() { document.body.classList.toggle('preview-off', !on); if (el) el.checked = on; }
+    ap(); if (el) el.addEventListener('change', function () { on = el.checked; try { localStorage.setItem(k, on ? '1' : '0'); } catch (e) {} ap(); });
+  })();
 </script>
 </body>
 </html>

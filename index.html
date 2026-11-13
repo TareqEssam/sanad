@@ -73,6 +73,11 @@
     #risk-indicator { font-weight: 800; }
     #settings-screen { justify-content: flex-start; overflow-y: auto; -webkit-overflow-scrolling: touch; }
     #settings-screen a, #settings-screen button { min-height: 52px; }
+    /* القوائم المنسدلة داخل صفوف flex: min-width الافتراضي = عرض أطول خيار، فتخرج من الإطار. */
+    #settings-screen select { min-width: 0; max-width: 100%; text-overflow: ellipsis; }
+    #ocr-lang-row { min-width: 0; }
+    #ocr-lang-row label { flex: 0 0 auto; }
+    #ocr-lang-row select { flex: 1 1 0%; min-width: 0; }
     input[type="checkbox"] { width: 25px; height: 25px; flex: 0 0 auto; accent-color: #2563eb; }
     #api-key-input, #proxy-url-input {
       direction: ltr; text-align: left; font-size: 16px; min-height: 52px;
@@ -218,7 +223,7 @@
 
           <div class="rounded-xl border border-purple-800/70 bg-purple-950/20 p-3 space-y-2">
             <strong class="block text-base text-purple-200">📖 قارئ النصوص + فاحص تاريخ انتهاء الأدوية</strong>
-            <div class="flex items-center gap-2">
+            <div id="ocr-lang-row" class="flex items-center gap-2">
               <label for="ocr-lang-select" class="text-xs font-bold text-gray-200">اللغة:</label>
               <select id="ocr-lang-select" class="flex-1 p-2 bg-gray-800 border border-gray-600 rounded-lg text-sm">
                 <option value="ara+eng">عربي + إنجليزي (الأفضل للأدوية والعملة والفواتير)</option>
@@ -2509,8 +2514,9 @@ async function findPersonalLive(item, generalPool) {
 async function verifyPersonal(targetRaw) {
   const items = await loadPersonalItems(); await loadInstalledPacks();
   const personalMatch = matchPersonalByName(items, targetRaw);
-  const generalMatch = personalMatch ? null : matchPersonalByName(generalClasses.filter(c => c.kind !== 'background'), targetRaw);
+  // يجب فحص الالتباس قبل أي استدعاء ثانٍ للمطابقة، لأن كل استدعاء يعيد ضبط personalAmbiguous
   if (!personalMatch && personalAmbiguous) { const m = 'وجدت عدة أشياء متشابهة: ' + personalAmbiguous.join('، ') + '. قل الاسم كاملاً.'; updateStatus(m); speak(m); return true; }
+  const generalMatch = personalMatch ? null : matchPersonalByName(generalClasses.filter(c => c.kind !== 'background'), targetRaw);
   const match = personalMatch || generalMatch;
   if (!match) return false;
   if (isProcessing) { updateStatus('انتظر انتهاء الطلب الحالي.'); return true; }

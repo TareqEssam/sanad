@@ -9,10 +9,10 @@
   <link rel="icon" type="image/png" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>سند V20.2 — العيون الشاملة ووطواط الظلام المدقق</title>
-  <script src="https://cdn.tailwindcss.com" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
   <style>
     html, body { height: 100%; overscroll-behavior: none; }
     .hidden { display: none !important; }
@@ -107,6 +107,16 @@
     body:not(.preview-off) #capture-btn { background: linear-gradient(to bottom, transparent 30%, rgba(3,7,18,.82)) !important; justify-content: flex-end !important; padding: 0 0 12px !important; }
     body:not(.preview-off) #capture-btn span { text-shadow: 0 1px 4px #000; }
     body.preview-off #camera-preview { inset: auto !important; top: 8px !important; right: 8px !important; width: 56px !important; height: 56px !important; opacity: .6 !important; border: 1px solid #374151 !important; border-radius: 8px !important; z-index: 10 !important; }
+
+    /* احتياط: تخطيط أساسي يبقى سليماً حتى لو لم يُحمَّل Tailwind (شبكة بطيئة/حجب). Tailwind يتجاوزها عند تحميله. */
+    .relative{position:relative}.absolute{position:absolute}.inset-0{top:0;right:0;bottom:0;left:0}.inset-x-0{left:0;right:0}
+    .bottom-0{bottom:0}.top-2{top:.5rem}.left-2{left:.5rem}.right-2{right:.5rem}.z-10{z-index:10}.z-20{z-index:20}.z-30{z-index:30}
+    .w-full{width:100%}.h-full{height:100%}.w-14{width:3.5rem}.h-14{height:3.5rem}.flex-1{flex:1 1 0%}.min-h-0{min-height:0}
+    .items-center{align-items:center}.justify-center{justify-content:center}.gap-1{gap:.25rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}
+    .object-cover{object-fit:cover}.pointer-events-none{pointer-events:none}.text-center{text-align:center}.bg-gray-900{background:#111827}
+    .text-5xl{font-size:3rem}.text-xl{font-size:1.25rem}.text-sm{font-size:.875rem}.text-xs{font-size:.75rem}.font-bold{font-weight:700}
+    .rounded-lg{border-radius:.5rem}.p-2{padding:.5rem}.p-4{padding:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}
+    #main-screen{background:#030712;color:#f3f4f6}
   </style>
 <script>
   (function () { function h() { var v = window.visualViewport; document.documentElement.style.setProperty('--app-h', Math.round(v ? v.height : window.innerHeight) + 'px'); }
@@ -137,7 +147,7 @@
         <span aria-hidden="true">▶ </span>ابدأ الآن (مجاني بالكامل)
       </button>
 
-      <label class="settings-step flex items-center gap-3 text-sm text-gray-100"><input id="preview-check" type="checkbox" checked><span>عرض معاينة الكاميرا كاملة على الشاشة (للمبصر المساعد وضعاف البصر)</span></label>
+      <label class="settings-step flex items-center gap-3 text-sm text-gray-100"><input id="preview-check" type="checkbox"><span>عرض معاينة الكاميرا كاملة (اختياري — الافتراضي: مربع صغير كما كان)</span></label>
 
       <button id="setup-guide-button" type="button" onclick="speakSetupGuide()"
               class="settings-action bg-indigo-700 hover:bg-indigo-600 text-white text-base">
@@ -2539,8 +2549,8 @@ window.addEventListener('load', () => {
 });
 </script>
 <script>
-  (function () { var k = 'sanad_preview', el = document.getElementById('preview-check'), on = true;
-    try { on = localStorage.getItem(k) !== '0'; } catch (e) {}
+  (function () { var k = 'sanad_preview', el = document.getElementById('preview-check'), on = false;
+    try { on = localStorage.getItem(k) === '1'; } catch (e) {}
     function ap() { document.body.classList.toggle('preview-off', !on); if (el) el.checked = on; }
     ap(); if (el) el.addEventListener('change', function () { on = el.checked; try { localStorage.setItem(k, on ? '1' : '0'); } catch (e) {} ap(); });
   })();
